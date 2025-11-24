@@ -1,4 +1,5 @@
 #include "ConfigurationManager.h"
+#include "IniFileParser.h"
 
 ConfigurationManager& ConfigurationManager::Instance()
 {
@@ -6,8 +7,9 @@ ConfigurationManager& ConfigurationManager::Instance()
 	return instance;
 }
 
-bool ConfigurationManager::Initialize()
+bool ConfigurationManager::Initialize(const std::string& filename)
 {
+	IniFileParser configFile(filename, m_loadedConfigs);
 	return false;
 }
 

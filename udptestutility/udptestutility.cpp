@@ -2,10 +2,14 @@
 //
 
 #include <iostream>
+#include "ConfigurationManager.h"
 
-int main()
+int main(int argc, char** argv)
 {
-    std::cout << "Hello World!\n";
+    std::string filename(argv[1]);
+
+    ConfigurationManager::Instance().Initialize(filename);
+
 }
 
 // Executar programa: Ctrl + F5 ou Menu Depurar > Iniciar Sem Depuração

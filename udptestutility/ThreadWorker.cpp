@@ -1,11 +1,18 @@
 #include "ThreadWorker.h"
 #include <chrono>
 
+// link with Ws2_32.lib
+#pragma comment(lib,"Ws2_32.lib")
+#include <winsock2.h>
+#include <ws2tcpip.h>
+
 ThreadWorker::ThreadWorker(const ConnectionConfig& config)
 	: m_config(config)
 	, m_isValid(true)
 	, m_period(std::chrono::milliseconds(0))
 	, m_nextTimeToExecute(std::chrono::milliseconds(0))
+	, m_socket(0)
+	, m_destInfo({})
 {
 	if ((m_config.payload == nullptr) && (m_config.payload_length == 0))
 	{
@@ -32,7 +39,23 @@ ThreadWorker::ThreadWorker(const ConnectionConfig& config)
 		std::cout << "Invalid Rate Config! " << std::endl;
 		m_period = std::chrono::milliseconds(0);
 		m_isValid = false;
+		return;
 	}
+	WSADATA wsaData = { 0 };
+	WSAStartup(MAKEWORD(2, 2), &wsaData);
+
+	m_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+
+	if (m_socket == INVALID_SOCKET)
+	{
+		std::cout << "Failed to create a socket" << std::endl;
+		m_isValid = false;
+		return;
+	}
+
+	m_destInfo.sin_family = AF_INET;
+	m_destInfo.sin_port = htons(m_config.destination_port);
+	inet_pton(AF_INET, m_config.destination_ip.c_str(), &m_destInfo.sin_addr);
 }
 
 void ThreadWorker::RunLoop()
@@ -50,6 +73,8 @@ void ThreadWorker::RunLoop()
 		if (now >= m_nextTimeToExecute)
 		{
 			m_nextTimeToExecute += m_period;
+
+			sendto(m_socket, (char*)m_config.payload, m_config.payload_length, 0, (sockaddr*)&m_destInfo, sizeof(m_destInfo));
 			/*std::cout << "Executado!" << std::endl;*/
 		}
 	}

@@ -8,10 +8,11 @@ const char* IniFileParser::m_validEntries[] = {
 		"payload_length",
 		"payload",
 		"destination_ip",
-		"destination_port"
+		"destination_port",
+		"sending_rate"
 };
 
-IniFileParser::IniFileParser(const std::string& filename, std::list<Connection>& out) :
+IniFileParser::IniFileParser(const std::string& filename, std::list<ConnectionConfig>& out) :
 	m_file(filename)
 	, m_succesfullRead(false)
 	, m_outputList(out)
@@ -28,15 +29,13 @@ IniFileParser::IniFileParser(const std::string& filename, std::list<Connection>&
 		std::cout << "Failed to read " << filename << " err code " << m_file.rdstate() << std::endl;
 		m_succesfullRead = false;
 	}
-
-	
 }
 
 bool IniFileParser::ParseFile()
 {
 	std::string line;
 
-	Connection* connection = nullptr;
+	ConnectionConfig* connection = nullptr;
 
 	while (std::getline(m_file, line))
 	{
@@ -49,7 +48,7 @@ bool IniFileParser::ParseFile()
 			//the first connection
 			if (connection == nullptr)
 			{
-				connection = new Connection();
+				connection = new ConnectionConfig();
 			}
 			else //happens when a new connection was identified during parsing a previous connection. In this case, we shall close the previous connection; and start a new one
 			{
@@ -58,7 +57,7 @@ bool IniFileParser::ParseFile()
 				connection->Print();
 
 				delete connection;
-				connection = new Connection();
+				connection = new ConnectionConfig();
 			}
 			
 			//std::cout << line << std::endl;
@@ -78,11 +77,15 @@ bool IniFileParser::ParseFile()
 					{
 					case 0:break; //[Connection]; ignore from here.
 					case 1: connection->payload_length = static_cast<size_t>(std::stoi(value));break; //payload_length;
-					case 2: connection->payload = new uint8_t(value.size());
-						memcpy(connection->payload, value.c_str(), value.size());
+					case 2:
+						connection->payload_length = value.size();
+						connection->payload = new uint8_t[connection->payload_length];
+						memset(connection->payload, 0, connection->payload_length);
+						memcpy(connection->payload, value.c_str(), connection->payload_length);
 						break; //payload;
 					case 3: connection->destination_ip = value; break; //destination_ip;
 					case 4: connection->destination_port = static_cast<size_t>(std::stoi(value));break; //destination_port;
+					case 5: connection->rate = static_cast<size_t>(std::stoi(value));break; //destination_port;
 					default:
 						break;
 					}
@@ -100,7 +103,7 @@ bool IniFileParser::ParseFile()
 		delete connection;
 	}
 
-	return false;
+	return true;
 }
 
 void IniFileParser::tokenizerString(const std::string& input, std::string& key, std::string& value)

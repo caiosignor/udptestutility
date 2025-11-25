@@ -9,8 +9,8 @@ public:
 
 	bool Initialize(const std::string& filename);
 
-	const std::list<Connection>& GetConfiguration() const;
+	const std::list<ConnectionConfig>& GetConfiguration() const;
 private:
-	std::list<Connection> m_loadedConfigs;
+	std::list<ConnectionConfig> m_loadedConfigs;
 };
 

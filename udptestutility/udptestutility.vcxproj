@@ -132,11 +132,13 @@
   <ItemGroup>
     <ClCompile Include="ConfigurationManager.cpp" />
     <ClCompile Include="IniFileParser.cpp" />
+    <ClCompile Include="ThreadWorker.cpp" />
     <ClCompile Include="udptestutility.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ConfigurationManager.h" />
     <ClInclude Include="IniFileParser.h" />
+    <ClInclude Include="ThreadWorker.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Config.ini" />

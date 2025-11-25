@@ -13,7 +13,7 @@ bool ConfigurationManager::Initialize(const std::string& filename)
 	return false;
 }
 
-const std::list<Connection>& ConfigurationManager::GetConfiguration() const
+const std::list<ConnectionConfig>& ConfigurationManager::GetConfiguration() const
 {
 	return m_loadedConfigs;
 }

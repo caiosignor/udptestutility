@@ -9,12 +9,14 @@ typedef struct _Connection{
 	uint8_t* payload;
 	std::string destination_ip;
 	uint16_t destination_port;
+	uint16_t rate;
 
 	_Connection() :
 		payload_length(0)
 		, payload(nullptr)
 		, destination_ip("")
 		, destination_port(0)
+		, rate(0)
 	{
 	}
 
@@ -27,14 +29,15 @@ typedef struct _Connection{
 		}
 		std::cout << "destination_ip = " << destination_ip << std::endl;
 		std::cout << "destination_port = " << destination_port << std::endl;
+		std::cout << "rate = " << rate << std::endl;
 	}
 
-}Connection;
+}ConnectionConfig;
 
 class IniFileParser
 {
 public:
-	IniFileParser(const std::string& filename, std::list<Connection>& out);
+	IniFileParser(const std::string& filename, std::list<ConnectionConfig>& out);
 private:
 	bool ParseFile();
 
@@ -46,6 +49,6 @@ private:
 
 	bool m_succesfullRead;
 
-	std::list<Connection>& m_outputList;
+	std::list<ConnectionConfig>& m_outputList;
 };
 

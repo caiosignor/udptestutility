@@ -10,20 +10,17 @@ int main(int argc, char** argv)
 
     ConfigurationManager::Instance().Initialize(filename);
 
-    std::list<ConnectionConfig> configs = ConfigurationManager::Instance().GetConfiguration();
+    const std::list<ConnectionConfig> configs = ConfigurationManager::Instance().GetConfiguration();
 
     std::vector<std::shared_ptr<ThreadWorker>> threads;
 
-    for (ConnectionConfig config : configs)
+    for (const ConnectionConfig& config : configs)
     {
         threads.push_back(std::make_shared<ThreadWorker>(config));
     }
 
-    while (true)
+    for (auto& thread : threads)
     {
-        for (auto& thread : threads)
-        {
-            thread->RunLoop();
-        }
+        thread->Join();
     }
 }

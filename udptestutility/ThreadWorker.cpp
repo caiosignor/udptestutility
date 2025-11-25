@@ -8,7 +8,6 @@
 
 ThreadWorker::ThreadWorker(const ConnectionConfig& config)
 	: m_config(config)
-	, m_isValid(true)
 	, m_period(std::chrono::milliseconds(0))
 	, m_nextTimeToExecute(std::chrono::milliseconds(0))
 	, m_socket(0)
@@ -17,7 +16,6 @@ ThreadWorker::ThreadWorker(const ConnectionConfig& config)
 	if ((m_config.payload == nullptr) && (m_config.payload_length == 0))
 	{
 		std::cout << "Invalid payload or payload_length Config! " << std::endl;
-		m_isValid = false;
 		return;
 	}
 
@@ -38,7 +36,6 @@ ThreadWorker::ThreadWorker(const ConnectionConfig& config)
 	{
 		std::cout << "Invalid Rate Config! " << std::endl;
 		m_period = std::chrono::milliseconds(0);
-		m_isValid = false;
 		return;
 	}
 	WSADATA wsaData = { 0 };
@@ -49,33 +46,24 @@ ThreadWorker::ThreadWorker(const ConnectionConfig& config)
 	if (m_socket == INVALID_SOCKET)
 	{
 		std::cout << "Failed to create a socket" << std::endl;
-		m_isValid = false;
 		return;
 	}
 
 	m_destInfo.sin_family = AF_INET;
 	m_destInfo.sin_port = htons(m_config.destination_port);
 	inet_pton(AF_INET, m_config.destination_ip.c_str(), &m_destInfo.sin_addr);
+
+	m_threadHandler = std::thread(&ThreadWorker::RunLoop, this);
 }
 
 void ThreadWorker::RunLoop()
 {
-	if (m_isValid)
+	while(true)
 	{
-		using clock = std::chrono::steady_clock;
+		sendto(m_socket, (char*)m_config.payload, m_config.payload_length, 0, (sockaddr*)&m_destInfo, sizeof(m_destInfo));
+		std::cout << "Executado!" << std::endl;
 
-		auto now = clock::now();
-
-		// Inicializa m_nextTimeToExecute apenas na primeira chamada
-		if (m_nextTimeToExecute == clock::time_point{})
-			m_nextTimeToExecute = now + m_period;
-
-		if (now >= m_nextTimeToExecute)
-		{
-			m_nextTimeToExecute += m_period;
-
-			sendto(m_socket, (char*)m_config.payload, m_config.payload_length, 0, (sockaddr*)&m_destInfo, sizeof(m_destInfo));
-			/*std::cout << "Executado!" << std::endl;*/
-		}
+		m_nextTimeToExecute = std::chrono::steady_clock::now() + m_period;
+		std::this_thread::sleep_until(m_nextTimeToExecute);
 	}
 }

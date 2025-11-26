@@ -67,3 +67,8 @@ void ThreadWorker::RunLoop()
 		std::this_thread::sleep_until(m_nextTimeToExecute);
 	}
 }
+
+ThreadWorker::~ThreadWorker()
+{
+	closesocket(m_socket);
+}

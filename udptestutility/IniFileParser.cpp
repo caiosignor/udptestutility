@@ -28,7 +28,7 @@ IniFileParser::IniFileParser(const std::string& filename, std::list<ConnectionCo
 	m_dispatch["payload"] = [](ConnectionConfig*& current, const std::string& value) {current->SetPayload(value);};
 	m_dispatch["destination_ip"] = [](ConnectionConfig*& current, const std::string& value) {current->SetDestinationIp(value);};
 	m_dispatch["destination_port"] = [](ConnectionConfig*& current, const std::string& value) {current->SetDestinationPort(value);};
-	m_dispatch["sending_rate"] = [](ConnectionConfig*& current, const std::string& value) {current->SetRate(value);};
+	m_dispatch["sending_period"] = [](ConnectionConfig*& current, const std::string& value) {current->SetRate(value);};
 
 	m_outputList.clear();
 

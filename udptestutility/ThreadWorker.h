@@ -10,6 +10,7 @@ class ThreadWorker
 {
 public:
 	ThreadWorker(const ConnectionConfig& config);
+	~ThreadWorker();
 
 	inline void Join()
 	{

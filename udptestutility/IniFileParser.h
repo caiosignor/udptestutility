@@ -54,12 +54,12 @@ typedef struct _Connection{
 
 	void SetDestinationPort(const std::string& value)
 	{
-		destination_port = static_cast<size_t>(std::stoi(value));
+		destination_port = static_cast<uint16_t>(std::stoi(value));
 	}
 
 	void SetRate(const std::string& value)
 	{
-		rate = static_cast<size_t>(std::stoi(value));
+		rate = static_cast<uint16_t>(std::stoi(value));
 	}
 
 }ConnectionConfig;

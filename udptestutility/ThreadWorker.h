@@ -24,7 +24,7 @@ private:
 	ConnectionConfig m_config;
 	std::chrono::milliseconds m_period;
 	std::chrono::steady_clock::time_point m_nextTimeToExecute{};
-	int m_socket;
+	SOCKET m_socket;
 	std::thread m_threadHandler;
 
 	sockaddr_in m_destInfo;

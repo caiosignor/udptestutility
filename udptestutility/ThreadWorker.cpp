@@ -39,7 +39,7 @@ ThreadWorker::ThreadWorker(const ConnectionConfig& config)
 		return;
 	}
 	WSADATA wsaData = { 0 };
-	WSAStartup(MAKEWORD(2, 2), &wsaData);
+	(void)WSAStartup(MAKEWORD(2, 2), &wsaData);
 
 	m_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
@@ -60,8 +60,12 @@ void ThreadWorker::RunLoop()
 {
 	while(true)
 	{
-		sendto(m_socket, (char*)m_config.payload, m_config.payload_length, 0, (sockaddr*)&m_destInfo, sizeof(m_destInfo));
-		std::cout << "Executado!" << std::endl;
+		sendto(m_socket,
+			reinterpret_cast<const char*>(m_config.payload),
+			static_cast<int>(m_config.payload_length),
+			0,
+			(sockaddr*)&m_destInfo,
+			sizeof(m_destInfo));
 
 		m_nextTimeToExecute = std::chrono::steady_clock::now() + m_period;
 		std::this_thread::sleep_until(m_nextTimeToExecute);

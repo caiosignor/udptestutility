@@ -90,6 +90,21 @@ bool IniFileParser::parseFile()
 
 void IniFileParser::tokenizerString(const std::string& input, std::string& key, std::string& value)
 {
+	//trim space and comments of str
+	auto trimStr = [](std::string& _input) {
+		auto pos = _input.find('#');
+		if (pos != std::string::npos)
+		{
+			_input = _input.substr(0, pos);
+		}
+
+		_input.erase(_input.begin(),
+			std::find_if(_input.begin(), _input.end(), [](char c){return !isspace(c);}));
+
+		_input.erase(std::find_if(_input.rbegin(), _input.rend(), [](char c) {return !isspace(c);}).base(), _input.end());
+
+	};
+
 	auto pos = input.find('=');
 
 	if (pos == std::string::npos)
@@ -102,4 +117,7 @@ void IniFileParser::tokenizerString(const std::string& input, std::string& key, 
 
 	key = input.substr(0, pos);
 	value = input.substr(pos+1);
+
+	trimStr(key);
+	trimStr(value);
 }

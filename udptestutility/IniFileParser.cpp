@@ -8,10 +8,11 @@ IniFileParser::IniFileParser(const std::string& filename, std::list<ConnectionCo
 	, m_succesfullRead(false)
 	, m_outputList(out)
 {
-	//create an map to handle each member of struct
-	m_dispatch["[Connection]"] = [&](ConnectionConfig*& current, const std::string& value) {
+    // Create a mapping between INI keys and struct-member setter functions.
+    // Each key maps to a lambda that modifies the current ConnectionConfig object.
+    m_dispatch["[Connection]"] = [&](ConnectionConfig*& current, const std::string& value)
 
-		//if found [Connection] Keywork and current is nullptr, means it is the first connection found. Just instantiate the struct
+            // First connection found — instantiate it
 		if (current == nullptr)
 		{
 			current = new ConnectionConfig();

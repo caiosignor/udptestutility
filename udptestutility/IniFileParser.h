@@ -3,6 +3,8 @@
 #include <iostream>
 #include <fstream>
 #include <list>
+#include <map>
+#include <functional>
 
 typedef struct _Connection{
 	size_t payload_length;
@@ -32,6 +34,34 @@ typedef struct _Connection{
 		std::cout << "rate = " << rate << std::endl;
 	}
 
+	void SetPayloadLength(const std::string& value)
+	{
+		payload_length = static_cast<size_t>(std::stoi(value));
+	}
+
+	void SetPayload(const std::string& value)
+	{
+		payload_length = value.size();
+		payload = new uint8_t[payload_length];
+		memset(payload, 0, payload_length);
+		memcpy(payload, value.c_str(), payload_length);
+	}
+
+	void SetDestinationIp(const std::string& value)
+	{
+		destination_ip = value;
+	}
+
+	void SetDestinationPort(const std::string& value)
+	{
+		destination_port = static_cast<size_t>(std::stoi(value));
+	}
+
+	void SetRate(const std::string& value)
+	{
+		rate = static_cast<size_t>(std::stoi(value));
+	}
+
 }ConnectionConfig;
 
 class IniFileParser
@@ -39,7 +69,7 @@ class IniFileParser
 public:
 	IniFileParser(const std::string& filename, std::list<ConnectionConfig>& out);
 private:
-	bool ParseFile();
+	bool parseFile();
 
 	void tokenizerString(const std::string& input, std::string& key, std::string& value);
 
@@ -48,6 +78,8 @@ private:
 	std::ifstream m_file;
 
 	bool m_succesfullRead;
+
+	std::map<std::string, std::function<void(ConnectionConfig*&, const std::string&)>> m_dispatch;
 
 	std::list<ConnectionConfig>& m_outputList;
 };

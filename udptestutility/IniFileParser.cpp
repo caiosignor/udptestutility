@@ -17,11 +17,33 @@ IniFileParser::IniFileParser(const std::string& filename, std::list<ConnectionCo
 	, m_succesfullRead(false)
 	, m_outputList(out)
 {
+	//create an map to handle each member of struct
+	m_dispatch["[Connection]"] = [&](ConnectionConfig*& current, const std::string& value) {
+
+		//if found [Connection] Keywork and current is nullptr, means it is the first connection found. Just instantiate the struct
+		if (current == nullptr)
+		{
+			current = new ConnectionConfig();
+		}
+		else //happens when a new connection was identified during parsing another connection. In this case, we shall store the last connection; and start a new one
+		{
+			m_outputList.push_back(*current);
+			delete current;
+			current = new ConnectionConfig();
+		}
+	};
+
+	m_dispatch["payload_length"] = [](ConnectionConfig*& current, const std::string& value) {current->SetPayloadLength(value);};
+	m_dispatch["payload"] = [](ConnectionConfig*& current, const std::string& value) {current->SetPayload(value);};
+	m_dispatch["destination_ip"] = [](ConnectionConfig*& current, const std::string& value) {current->SetDestinationIp(value);};
+	m_dispatch["destination_port"] = [](ConnectionConfig*& current, const std::string& value) {current->SetDestinationPort(value);};
+	m_dispatch["sending_rate"] = [](ConnectionConfig*& current, const std::string& value) {current->SetRate(value);};
+
 	m_outputList.clear();
 
 	if (m_file.is_open())
 	{
-		m_succesfullRead = ParseFile();
+		m_succesfullRead = parseFile();
 		m_file.close();
 	}
 	else
@@ -31,7 +53,7 @@ IniFileParser::IniFileParser(const std::string& filename, std::list<ConnectionCo
 	}
 }
 
-bool IniFileParser::ParseFile()
+bool IniFileParser::parseFile()
 {
 	std::string line;
 
@@ -42,63 +64,32 @@ bool IniFileParser::ParseFile()
 		if (line.empty() || line[0] == '#')
 			continue; // ignore empty a commented lines
 
-		//identified a new connection
-		if (!line.compare(m_validEntries[0]))
+		std::string key, value;
+
+		if (line == "[Connection]")
 		{
-			//the first connection
-			if (connection == nullptr)
-			{
-				connection = new ConnectionConfig();
-			}
-			else //happens when a new connection was identified during parsing a previous connection. In this case, we shall close the previous connection; and start a new one
-			{
-				m_outputList.push_back(*connection);
-
-				connection->Print();
-
-				delete connection;
-				connection = new ConnectionConfig();
-			}
-			
-			//std::cout << line << std::endl;
+			key = line;
 		}
-		else //load parameters
+		else
 		{
-			size_t totalEntries = std::size(m_validEntries);
-			std::string key, value;
 			tokenizerString(line, key, value);
-
-			//i = 0, already covered in previous if. 0 reserved for [Connection]
-			for (int i = 1; i < totalEntries; i++)
-			{
-				if (!key.compare(m_validEntries[i]))
-				{
-					switch (i)
-					{
-					case 0:break; //[Connection]; ignore from here.
-					case 1: connection->payload_length = static_cast<size_t>(std::stoi(value));break; //payload_length;
-					case 2:
-						connection->payload_length = value.size();
-						connection->payload = new uint8_t[connection->payload_length];
-						memset(connection->payload, 0, connection->payload_length);
-						memcpy(connection->payload, value.c_str(), connection->payload_length);
-						break; //payload;
-					case 3: connection->destination_ip = value; break; //destination_ip;
-					case 4: connection->destination_port = static_cast<size_t>(std::stoi(value));break; //destination_port;
-					case 5: connection->rate = static_cast<size_t>(std::stoi(value));break; //destination_port;
-					default:
-						break;
-					}
-				}
-			}
 		}
 
+		auto handler = m_dispatch.find(key);
+
+		if (handler == m_dispatch.end())
+		{
+			std::cout << "Unkown parameter: " << key << std::endl;
+		}
+		else
+		{
+			handler->second(connection, value);
+		}
 	}
 
 	//if reach the end of the file. Store the current connection config to list
 	if (connection != nullptr)
 	{
-		connection->Print();
 		m_outputList.push_back(*connection);
 		delete connection;
 	}

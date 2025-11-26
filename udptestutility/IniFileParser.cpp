@@ -3,15 +3,6 @@
 #include <fstream>
 #include <string>
 
-const char* IniFileParser::m_validEntries[] = {
-		"[Connection]",
-		"payload_length",
-		"payload",
-		"destination_ip",
-		"destination_port",
-		"sending_rate"
-};
-
 IniFileParser::IniFileParser(const std::string& filename, std::list<ConnectionConfig>& out) :
 	m_file(filename)
 	, m_succesfullRead(false)

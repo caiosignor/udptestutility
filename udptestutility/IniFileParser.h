@@ -73,8 +73,6 @@ private:
 
 	void tokenizerString(const std::string& input, std::string& key, std::string& value);
 
-	static const char* m_validEntries[];
-
 	std::ifstream m_file;
 
 	bool m_succesfullRead;

@@ -8,7 +8,13 @@ int main(int argc, char** argv)
 {
     std::string filename(argv[1]);
 
-    ConfigurationManager::Instance().Initialize(filename);
+    bool initialized = ConfigurationManager::Instance().Initialize(filename);
+
+    if (!initialized)
+    {
+        std::cout << "Error on loading configuration!" << std::endl;
+        return -1;
+    }
 
     const std::list<ConnectionConfig> configs = ConfigurationManager::Instance().GetConfiguration();
 

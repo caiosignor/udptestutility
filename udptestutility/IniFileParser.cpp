@@ -32,6 +32,8 @@ IniFileParser::IniFileParser(const std::string& filename, std::list<ConnectionCo
     m_dispatch["destination_ip"] = [](ConnectionConfig*& current, const std::string& value) { current->SetDestinationIp(value); };
     m_dispatch["destination_port"] = [](ConnectionConfig*& current, const std::string& value) { current->SetDestinationPort(value); };
     m_dispatch["sending_period"] = [](ConnectionConfig*& current, const std::string& value) { current->SetRate(value); };
+    m_dispatch["source_port"] = [](ConnectionConfig*& current, const std::string& value) { current->SetSourcePort(value); };
+    m_dispatch["source_ip"] = [](ConnectionConfig*& current, const std::string& value) { current->SetSourceIp(value); };
 
     // Ensure output list starts empty
     m_outputList.clear();

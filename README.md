@@ -35,11 +35,13 @@ Lines starting with `#` are comments and ignored by the parser.
 ```ini
 [Connection]
 #payload_length=100
-payload=abcdefghijklm
+payload=adsadhiuashdiusahduiashduiashduisah
 destination_ip=192.168.1.100
 destination_port=5000
-# sending_period (rate) in milliseconds
+#sending_period rate in ms
 sending_period=1000
+source_port=4000
+source_ip=192.168.1.110
 
 [Connection]
 payload_length=1024
@@ -65,6 +67,8 @@ block may contain the following keys:
 | destination_ip   | string   | required | Destination IPv4 address (unicast or multicast). The parser will warn for invalid addresses.    |
 | destination_port | integer  | required | UDP destination port.                                                                           |
 | sending_period   | integer  | required | Delay between sends in milliseconds. Small values (0–5 ms) may saturate CPU or network.         |
+| source_port   | integer  | optional | Local UDP Port     |
+| source_ip   | integer  | Required only when source_port was specified. Otherwise, optional | Local IPv4 address     |
 
 
 ### Important Rules

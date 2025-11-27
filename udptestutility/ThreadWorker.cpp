@@ -57,6 +57,31 @@ ThreadWorker::ThreadWorker(const ConnectionConfig& config)
 	m_destInfo.sin_family = AF_INET;
 	m_destInfo.sin_port = htons(m_config.destination_port);
 
+	//Set bind a source port if it was specified
+	if (m_config.source_port != 0 && !m_config.source_ip.empty())
+	{
+		sockaddr_in localAddr;
+		memset(&localAddr, 0, sizeof(localAddr));
+		localAddr.sin_family = AF_INET;
+		localAddr.sin_addr.s_addr = INADDR_ANY;
+		localAddr.sin_port = htons(m_config.source_port);
+
+		if (inet_pton(AF_INET, m_config.source_ip.c_str(), &localAddr.sin_addr) <=0)
+		{
+			std::cout << "[ERROR] Error to set the source ip " << m_config.source_ip << std::endl;
+			closesocket(m_socket);
+			return;
+		}
+
+		// 3. Associar (bind) o socket à porta
+		if (bind(m_socket, (struct sockaddr*)&localAddr, sizeof(localAddr)) < 0) {
+			std::cout << "[ERROR] Error to bind a port " << m_config.source_port << std::endl;
+			closesocket(m_socket);
+			return;
+		}
+
+	}
+
 	if (inet_pton(AF_INET, m_config.destination_ip.c_str(), &m_destInfo.sin_addr) != 1)
 	{
 		std::cout << "[ERROR] Invalid IP address: " << m_config.destination_ip << std::endl;

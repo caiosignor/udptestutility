@@ -15,11 +15,13 @@
  * from strings.
  */
 typedef struct _Connection {
-    size_t payload_length;            /**< Size of the payload in bytes. */
-    uint8_t* payload;                 /**< Pointer to dynamically allocated payload buffer. */
     std::string destination_ip;       /**< Destination IPv4 address as string. */
+    std::string source_ip;            /**< Source IPv4 address as string. */
+    size_t payload_length;            /**< Size of the payload in bytes. */
     uint16_t destination_port;        /**< Destination UDP port. */
     uint16_t rate;                    /**< Sending Period in ms. */
+    uint16_t source_port;             /**< Source UDP port. */
+    uint8_t* payload;                 /**< Pointer to dynamically allocated payload buffer. */
 
     /**
      * @brief Default constructor.
@@ -27,11 +29,13 @@ typedef struct _Connection {
      * Initializes all fields to zero or empty values.
      */
     _Connection() :
-        payload_length(0),
-        payload(nullptr),
         destination_ip(""),
+        source_ip(""),
+        payload_length(0),
         destination_port(0),
-        rate(0)
+        rate(0),
+        source_port(0),
+        payload(nullptr)
     {
     }
 
@@ -103,6 +107,23 @@ typedef struct _Connection {
         rate = static_cast<uint16_t>(std::stoi(value));
     }
 
+    /**
+     * @brief Sets the Source UDP port from a string.
+     * @param value String representing the port number.
+     */
+    void SetSourcePort(const std::string& value)
+    {
+        source_port = static_cast<uint16_t>(std::stoi(value));
+    }
+
+    /**
+    * @brief Sets the Source IP address.
+    * @param value IP address as string.
+    */
+    void SetSourceIp(const std::string& value)
+    {
+        source_ip = value;
+    }
 } ConnectionConfig;
 
 /**

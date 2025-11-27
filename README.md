@@ -21,7 +21,7 @@ The UDP Test Utility reads a configuration file containing one or more `[Connect
 
 - the payload to send (or a payload length to auto-generate),  
 - the destination IP (unicast or multicast),  
-- the UDP port, and  
+- the UDP port
 - the sending period in milliseconds.
 
 For each `[Connection]` block the application spawns a separate worker (background thread) that opens a UDP socket and transmits packets periodically according to the configuration.
@@ -104,7 +104,7 @@ block may contain the following keys:
 - [For Developer](#for-developer)
 
 ### For Tester
-A brief python script was developed to test the this application. It has three tests which is described bellow
+A brief python script was developed to test this application. It has three tests which is described bellow
 | Test Description | Acceptance criterea | Test Procedure |
 |------------------| --------------------| -------------- |
 | Verifies the capability of the software to read a configuration.ini file and send packets with the correct length | The received packet size is equal to payload_length defined in the configuration file | The automated test creates a default configuration.ini file specifying destination IP, port, payload_length and rate. It creates a listener socket using the same configuration, receives the data, and compares the received size with the expected value |

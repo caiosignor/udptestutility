@@ -6,7 +6,11 @@
 
 int main(int argc, char** argv)
 {
-    std::string filename(argv[1]);
+    std::string filename("");
+    if (argc > 1)
+    {
+        filename = argv[1];
+    }
 
     bool initialized = ConfigurationManager::Instance().Initialize(filename);
 
